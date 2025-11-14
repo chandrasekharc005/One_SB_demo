@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: env-uat-cm
+  namespace: insurance-demo   # 👈 replace with your actual namespace
+data:
+  TZ: "Asia/Kolkata"
+  ENVIRONMENT: "demo"
+  BUCKET: ""
+  GATEWAY_USERNAME: "finoux_key"
+  GATEWAY_PASSWORD: "finoux_secret"
+  JWT_SECRET_KEY: ""
+  AUTH_SECRET_KEY: ""
+  ENCRYPTION_SECRET_KEY: ""
+  ENCRYPTION_SECRET_IV: ""
+  ENCRYPTION: "false"
+  CLIENT_URL_LIFETERM: ""
+  CLIENT_URL_SAVINGS: ""
+  CIS: ""
+  DISTRIBUTOR_ID: "BCIBL"
+  DB_ENGINE: "postgresql"
+  DB_HOSTNAME: "192.168.1.141"
+  DB_PORT: "5432"
+  DB_HOSTNAME_READ: ""
+  DB_USERNAME: "onsuritysbadmin"
+  DB_PASSWORD: "abc_1234!"
+  DB_TARGETED_SCHEMA: "onsurity_uat"
+  EMAIL_PASSWORD: ""
+  EMAIL_HOST: "smtp.gmail.com"
+  MSG_FROM: "Customer Care SilverBullet"
+  SENDER_EMAIL: "customer.service@1silverbullet.tech"
+  EMAIL_TIMEOUT: "30"
+  SP_DETAIL_API_URL: ""
+  REPORTS_EMAIL: "priyank.singh@1silverbullet.tech"
+  REPORTS_FREQ: "MTD"
+  CLIENT_URL_HEALTH: ""
+  CLIENT_SECRET_KEY: "1SB"
+  SEND_MAIL: "true"
+  POST_PAYMENT: "ICICI,CHIL,IL.*.health,BAGIC,TAGIC,MAXLIFE,BALIC,HDFC.B2C,HDFCERGO,STAR"
+  PRE_PAYMENT: "NBHI,ABHI,TATA,ABSLIFEI,IL.*.motor"
+  PAYMENT_BEFORE_PROPOSAL: "ICICI,BALIC"
+  PAYMENT_AFTER_PROPOSAL: "CHIL,IL.*.health,BAGIC,TAGIC,HDFC.B2C,HDFCERGO,STAR"
+  MANAGE_PLAN_URL: ""
+  FILE_ENCODING: "true"
+
+  HEADERS: "['*']"
+  METHODS: "['*']"
+  ORIGINS: "(.*?)"
+  CREDENTIALS: "True"
+
+  CLIENT_INFO_AUTH_USER_PASS: ""
+  CLIENT_INFO_AUTH_USER: ""
+# 

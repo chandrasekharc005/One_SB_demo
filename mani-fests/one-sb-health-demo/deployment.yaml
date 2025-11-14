@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: one-sb-health-demo
+  namespace: insurance-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: one-sb-health-demo
+  template:
+    metadata:
+      labels:
+        app: one-sb-health-demo
+    spec:
+      serviceAccountName: onsurityk8s
+      imagePullSecrets:
+        - name: ecr-registry-secret
+      nodeSelector:
+        node-role: worker-2
+      containers:
+        - name: one-sb-health-demo
+          image: 106102357433.dkr.ecr.ap-south-1.amazonaws.com/one-sb-health-demo:latest
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /v2/healthcheck
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /v2/healthcheck
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "600m"
+              memory: "512Mi"
