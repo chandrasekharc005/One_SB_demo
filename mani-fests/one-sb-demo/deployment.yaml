@@ -13,6 +13,8 @@ spec:
       labels:
         app: one-sb-demo
     spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       serviceAccountName: onsurityk8s
       imagePullSecrets:
         - name: ecr-registry-secret
