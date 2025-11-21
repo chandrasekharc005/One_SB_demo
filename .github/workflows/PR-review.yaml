@@ -1,0 +1,83 @@
+name: "Org PR validation - JIRA key + description"
+
+# This org-level workflow listens for PR activity across repos in the org.
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  issues: write    # so workflow can post comments
+  contents: read
+  pull-requests: read
+
+jobs:
+  validate-pr:
+    name: Validate PR title and description
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR and comment
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            const number = pr.number;
+            const title = (pr.title || "").trim();
+            const body = (pr.body || "").trim();
+
+            const jiraRegex = /^[A-Z]+-\d+:\s*/;
+
+            let errors = [];
+
+            if (!jiraRegex.test(title)) {
+              errors.push("PR title must start with an uppercase JIRA key and colon. Example: `ABC-123: short summary`");
+            }
+
+            const bodyNonWhitespaceLen = body.replace(/\s/g, "").length;
+            if (bodyNonWhitespaceLen < 20) {
+              errors.push("PR description must contain at least 20 non-whitespace characters.");
+            }
+
+            // Clean previous bot comments from this workflow to avoid noise
+            const comments = await github.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: number
+            });
+
+            for (const c of comments.data) {
+              if (c.user && c.user.type === "Bot" && c.body && c.body.includes("⚠️ **PR validation failed**")) {
+                await github.issues.deleteComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: c.id
+                }).catch(()=>{});
+              }
+            }
+
+            if (errors.length > 0) {
+              const commentBody = [
+                "⚠️ **PR validation failed**",
+                "",
+                "The PR does not meet the organization's validation rules. Please fix the listed issues and push an update.",
+                "",
+                ...errors.map(e => `- ${e}`),
+                "",
+                "**Rules**:",
+                "- Title must start with `PROJECTKEY-<number>:` (uppercase project key).",
+                "- Description must be at least 20 non-whitespace characters.",
+                "",
+                "Example valid title: `PAY-345: fix token refresh race`",
+              ].join("\n");
+
+              await github.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: number,
+                body: commentBody
+              });
+
+              throw new Error("PR validation failed: " + errors.join("; "));
+            }
+
+            core.info("PR validation passed.");
